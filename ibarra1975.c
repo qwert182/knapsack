@@ -88,7 +88,7 @@ static void FILL(struct L *small, elem_t M, elem_t *p, elem_t *c, elem_t *P_out,
 
 #define USE_FILL 1
 
-void ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
+void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
   unsigned n = task->n;
   elem_t M = *task_get_maxweight(task);
   void *buf = alloca(2*n * sizeof(elem_t) + n * sizeof(unsigned));
@@ -181,7 +181,7 @@ void ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
 	  unsigned *I = (unsigned *)alloca(2 * small_size * sizeof(unsigned));
 	  unsigned *maxI = &I[small_size];
 	  elem_t alpha = 0;
-	  void *tmp;
+	  unsigned *tmp;
 #endif
 	  unsigned k,maxk = (unsigned)-1;
 	  elem_t max = 0;

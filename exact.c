@@ -85,7 +85,7 @@ static void solve01_checker(elem_t *sol, struct task *task) {
 }
 
 
-void solve_01(elem_t *sol, struct task *task) {
+void task_solve_01(elem_t *sol, struct task *task) {
   unsigned i, n = task->n;
   elem_t *x, *a = task_get_weights(task), *c = task_get_costs(task);
   elem_t b_m_ax, b = *task_get_maxweight(task), sol_cx = 0;
@@ -125,13 +125,13 @@ void solve_01(elem_t *sol, struct task *task) {
 	}
 
 check: return;
-	{
-	  elem_t *sol_check = (elem_t *)alloca(n * sizeof(elem_t));
-	  elem_t sol_check_cx;
-		solve01_checker(sol_check, task);
-		sol_check_cx = mul_vec(c, sol_check, n);
-		if (sol_cx != sol_check_cx) {
-			fprintf(stderr, "error\n"); //__asm int 3
-		}
-	}
+	//{
+	//  elem_t *sol_check = (elem_t *)alloca(n * sizeof(elem_t));
+	//  elem_t sol_check_cx;
+	//	solve01_checker(sol_check, task);
+	//	sol_check_cx = mul_vec(c, sol_check, n);
+	//	if (sol_cx != sol_check_cx) {
+	//		fprintf(stderr, "error\n"); //__asm int 3
+	//	}
+	//}
 }

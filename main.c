@@ -14,12 +14,12 @@ static void test01_1(void) {
   static TASK_DECL(_task, 5, 15, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {0,1,0,1,0};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -30,12 +30,12 @@ static void test01_2(void) {
   static TASK_DECL(_task, 5, 12, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {1,0,0,0,1};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -46,12 +46,12 @@ static void test01_3(void) {
   static TASK_DECL(_task, 5, 12, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {1,0,0,0,1};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -62,12 +62,12 @@ static void test01_4(void) {
   static TASK_DECL(_task, 5, 3, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {1,0,0,0,0};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -78,12 +78,12 @@ static void test01_5(void) {
   static TASK_DECL(_task, 5, 19, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {0, 1, 0, 1, 1};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -95,12 +95,12 @@ static void test01_6(void) {
   static TASK_DECL(_task, 5, 6, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {0, 1, 0, 0, 0};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -112,29 +112,29 @@ static void test01_7(void) {
   static TASK_DECL(_task, 5, 4, C, P);
 	elem_t sol[5], sol_ibarra[5];
 	static elem_t const rsol[] = {0, 0, 0, 1, 0};
-	solve_01(sol, (struct task *)&_task);
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, EPS);
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
 
-// this test produces solution which have an error = (19-15)/19 > 0.2 in case SMALL isn't used by ibarra1975_01
+// this test produces solution which have an error = (19-15)/19 > 0.2 in case SMALL isn't used by task_ibarra1975_01
 static void test01_8(void) {
   #define P {5, 15, 2, 13, 2}
   #define C {15, 5, 2, 16, 6}
   static TASK_DECL(_task, 5, 17, C, P);
 	elem_t sol[5], sol_ibarra[5];
-	static elem_t const rsol[] = {0, 0, 0, 1, 0};
-	solve_01(sol, (struct task *)&_task);
+	static elem_t const rsol[] = {0, 1, 1, 0, 1};
+	task_solve_01(sol, (struct task *)&_task);
 	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
 	task_print((struct task *)&_task);
-	solution_print(sol, "sol", (struct task *)&_task);
-	ibarra1975_01(sol_ibarra, (struct task *)&_task, REAL_T(0.2));
-	solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, REAL_T(0.2));
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
   #undef C
   #undef P
 }
@@ -142,13 +142,13 @@ static void test01_8(void) {
 
 
 int main() {
-	//test01_1();
-	//test01_2();
-	//test01_3();
-	//test01_4();
-	//test01_5();
-	//test01_6();
-	//test01_7();
+	test01_1();
+	test01_2();
+	test01_3();
+	test01_4();
+	test01_5();
+	test01_6();
+	test01_7();
 	test01_8();
 }
 
@@ -156,14 +156,97 @@ int main() {
 #else
 
 
-#define N 10
+
+#if 1
+
+//error eps = 0.400000
+//task n=5
+// costs      = (14,14,14, 3,10)
+// weights    = ( 4,15, 1,16,13) <= 18
+// volumes    = (10, 6, 9, 2, 1) <= 10
+// sol        = ( 0, 0, 1, 0, 1) --> 24
+// sol_ibarra = ( 0, 1, 0, 0, 0) --> 14
+
+static void test01_1(void) {
+  #define C {14,14,14, 3,10}
+  #define W { 4,15, 1,16,13}
+  #define V {10, 6, 9, 2, 1}
+  static TASK2_DECL(_task, 5, 18, 10, W, V, C);
+	elem_t sol[5], sol_ibarra[5];
+	static elem_t const rsol[] = { 0, 0, 1, 0, 1};
+	task2_solve_01(sol, (struct task2 *)&_task);
+	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
+	task2_print((struct task2 *)&_task);
+	task2_solution_print(sol, "sol       ", (struct task2 *)&_task);
+	task2_ibarra1975_01(sol_ibarra, (struct task2 *)&_task, REAL_T(0.4));
+	task2_solution_print(sol_ibarra, "sol_ibarra", (struct task2 *)&_task);
+  #undef C
+  #undef P
+}
+
+int main() {
+	test01_1();
+}
+
+#else
+
+#define N 5
 
 int main(int argc, char **argv) {
+  struct task2 *task;
+  elem_t sol[N];
+  elem_t sol_ibarra[N];
+  //int ch = -1;
+  unsigned i = 0, tasks_n = 1000;
+  unsigned start, end;
+  elem_t P_star, P_roof;
+  real_t eps;
+  static real_t const eps_arr[] = {REAL_T(1.0), REAL_T(0.9), REAL_T(0.8), REAL_T(0.7), REAL_T(0.6), REAL_T(0.5), REAL_T(0.4), REAL_T(0.3), REAL_T(0.2)};
+  unsigned eps_i;
+	(void)(argc, argv);
+	task = task2_create(N);
+										task2_fill_random(task, 20);
+	start = GetTickCount();
+	for (; i < tasks_n;) {
+		++i;
+		task2_fill_random(task, 20);
+		task2_solve_01(sol, task);
+		P_star = mul_vec(sol, task2_get_costs(task), N);
+		//for (eps = REAL_T(0.1); eps <= REAL_T(1.0); eps += REAL_T(0.09)) {
+		for (eps_i = 0; eps_i < elements_in(eps_arr); ++eps_i) {
+			eps = eps_arr[eps_i];
+			task2_ibarra1975_01(sol_ibarra, task, eps);
+			P_roof = mul_vec(sol_ibarra, task2_get_costs(task), task->n);
+			if (!(P_roof >= P_star * (REAL_T(1.0) - eps)) ) {
+			//if (!((P_star - P_roof)/(real_t)P_star <= eps/3.0f)) {
+				printf("error eps = %lf\n", eps);
+				task2_print(task);
+				task2_solution_print(sol, "sol       ", task);
+				task2_solution_print(sol_ibarra, "sol_ibarra", task);
+				//task2_ibarra1975_01(sol_ibarra, task, eps);
+				printf("\n");
+			}
+		}
+	}
+	end = GetTickCount();
+	printf("time = %u.%03u sec, iters = %u, time/iter = %lf usec\n", (end - start)/1000, (end - start)%1000, i, (double)((end - start)*1000)/i);
+
+	task2_delete(task);
+	return 0;
+}
+
+#undef N
+
+#endif
+
+#define N 10
+
+int main2(int argc, char **argv) {
   struct task *task;
   elem_t sol[N];
   elem_t sol_ibarra[N];
   //int ch = -1;
-  unsigned i = 0, tasks_n = 10;
+  unsigned i = 0, tasks_n = 10000;
   unsigned start, end;
   elem_t P_star, P_roof;
   real_t eps;
@@ -171,34 +254,25 @@ int main(int argc, char **argv) {
   unsigned eps_i;
 	(void)(argc, argv);
 	task = task_create(N);
-	//scanf("%u", &tasks_n);
-	//{
-	//  char must_be_not_written;
-	//	if (argc < 2 || sscanf(argv[1], "%u%c", &tasks_n, &must_be_not_written) != 1) {
-	//		fprintf(stderr, "ERROR: wrong arguments\n");
-	//		//exit(1);
-	//	}
-	//}
 
 	start = GetTickCount();
 	for (; i < tasks_n;) {
-		//if (i >= tasks_n) break;
 		++i;
 		task_fill_random(task, 20);
-		solve_01(sol, task);
+		task_solve_01(sol, task);
 		P_star = mul_vec(sol, task_get_costs(task), N);
 		//for (eps = REAL_T(0.1); eps <= REAL_T(1.0); eps += REAL_T(0.09)) {
-		for (eps_i = 0; eps_i < sizeof(eps_arr)/sizeof(*eps_arr); ++eps_i) {
+		for (eps_i = 0; eps_i < elements_in(eps_arr); ++eps_i) {
 			eps = eps_arr[eps_i];
-			ibarra1975_01(sol_ibarra, task, eps);
+			task_ibarra1975_01(sol_ibarra, task, eps);
 			P_roof = mul_vec(sol_ibarra, task_get_costs(task), task->n);
-			if (1 || !(P_roof >= P_star * (REAL_T(1.0) - eps)) && P_roof != 0) {
+			if (!(P_roof >= P_star * (REAL_T(1.0) - eps)) && P_roof != 0) {
 			//if (!((P_star - P_roof)/(real_t)P_star <= eps/3.0f)) {
 				printf("error eps = %lf\n", eps);
 				task_print(task);
-				solution_print(sol, "sol", task);
-				solution_print(sol_ibarra, "sol_ibarra", task);
-				ibarra1975_01(sol_ibarra, task, eps);
+				task_solution_print(sol, "sol", task);
+				task_solution_print(sol_ibarra, "sol_ibarra", task);
+				task_ibarra1975_01(sol_ibarra, task, eps);
 				printf("\n");
 			}
 		}
