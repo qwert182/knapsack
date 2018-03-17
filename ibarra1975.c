@@ -40,14 +40,7 @@ static inline int is_empty_t(struct TABLE *table) {
 	return table->P == -1;
 }
 
-static inline void free_list(struct L *list) {(void)list;}
-
-static inline void set_list(struct L **list_ptr, struct L *list_new, unsigned item_to_append) {
-  struct L *list_item;
-	if (*list_ptr != NULL) {
-		free_list(*list_ptr);
-	}
-	list_item = (struct L *)malloc(sizeof(*list_item));
+static inline void set_list(struct L **list_ptr, struct L *list_new, unsigned item_to_append, struct L *list_item) {
 	list_item->i = item_to_append;
 	list_item->next = list_new;
 	*list_ptr = list_item;
@@ -61,9 +54,7 @@ static inline void set_list(struct L **list_ptr, struct L *list_new, unsigned it
 	*list_ptr = list_item;
 }*/
 
-static inline void append_list_end(struct L **list_ptr, unsigned item_to_append) {
-  struct L *list_item;
-	list_item = (struct L *)malloc(sizeof(*list_item));
+static inline void append_list_end(struct L **list_ptr, unsigned item_to_append, struct L *list_item) {
 	list_item->i = item_to_append;
 	list_item->next = NULL;
 	*list_ptr = (*list_ptr)->next = list_item;
@@ -129,7 +120,7 @@ void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
 
 // Step 3
 	delta = P_wave * eps2 / REAL_T(9.0);
-	g = (unsigned)(REAL_T(9.0) / eps2);
+	g = (unsigned)(REAL_T(9.0) / eps2) + 1;
 
 // Step 4
 	table = (struct TABLE *)alloca((g+1) * sizeof*table);
@@ -147,7 +138,7 @@ void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
 	// Step 6
 		if (p[i]*3 <= eps*P_wave) {
 			//small += (p[i], c[i]);
-			append_list_end(&small_end, i);
+			append_list_end(&small_end, i, (struct L *)alloca(sizeof(struct L)));
 			++small_size;
 			continue; //goto Step_8;
 		}
@@ -163,7 +154,7 @@ void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
 		for (;;) {
 			if (!is_empty_t(&table[j]) && table[j].W + c[i] <= M) {
 				if (is_empty_t(&table[j+f_i]) || table[j+f_i].W > table[j].W+c[i]) {
-					set_list(&table[j+f_i].L, table[j].L, i);
+					set_list(&table[j+f_i].L, table[j].L, i, (struct L *)alloca(sizeof(struct L)));
 					table[j+f_i].P = table[j].P + p[i];
 					table[j+f_i].W = table[j].W + c[i];
 				}

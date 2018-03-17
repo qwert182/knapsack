@@ -36,6 +36,7 @@ struct L {
 };
 
 struct TABLE {
+	struct TABLE *next;
 	struct L *L;
 	elem_t C;
 	elem_t W, V;
@@ -66,7 +67,6 @@ static inline void set_list(struct L **list_ptr, struct L *list_new, unsigned it
 	*list_ptr = list_item;
 }
 
-//FILL(small, mw - table[k].W, mv - table[k].V, c, w, v, &alpha, I);
 static void FILL(struct L *small, elem_t mw, elem_t mv, elem_t *c, elem_t *w, elem_t *v, elem_t *C_out, unsigned *I_out) {
   unsigned i;
   struct L *cur_index;
@@ -80,12 +80,14 @@ static void FILL(struct L *small, elem_t mw, elem_t mv, elem_t *c, elem_t *w, el
 			C += c[cur_index->i];
 			I_out[i] = cur_index->i;
 		} else {
+			W = mw; // disables consideration of the rest elements after critical one (replaces ordinary full greedy algorithm with FILL)
 			I_out[i] = (unsigned)-1;
 		}
 	}
 	*C_out = C;
 }
 
+																																				extern elem_t task2_ibarra1975_01__P_star;elem_t task2_ibarra1975_01__P_star;
 
 void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	//memset(sol, 0, task->n * sizeof(*sol));
@@ -98,12 +100,14 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
   elem_t *c = alloca(n * sizeof*c);
 
   struct task *task_max = task_create(n);
-  struct task *task_min = task_create(n);
   elem_t *weights_max = task_get_weights(task_max);
-  elem_t *weights_min = task_get_weights(task_min);
   elem_t *task_max_sol = alloca(n*sizeof(elem_t));
-  elem_t *task_min_sol = alloca(n*sizeof(elem_t));
-  elem_t P_lower_bound, P_upper_bound;
+  elem_t P_lower_bound;
+
+  //struct task *task_min = task_create(n);
+  //elem_t *weights_min = task_get_weights(task_min);
+  //elem_t *task_min_sol = alloca(n*sizeof(elem_t));
+  //elem_t P_upper_bound;
 
   const real_t eps2 = eps * eps;
   real_t delta;
@@ -130,33 +134,54 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 
 // Step 2
 
-	// task min preparation
-	for (i = 0; i < n; ++i) {
-	  elem_t w_i = w[i] * mv, v_i = v[i] * mw;
-		weights_min[i] = min(w_i, v_i);
-	}
 	memcpy(task_get_costs(task_max), c, n*sizeof*c);
-	memcpy(task_get_costs(task_min), c, n*sizeof*c);
-	*task_get_maxweight(task_max) = *task_get_maxweight(task_min) = mw * mv;
+	*task_get_maxweight(task_max) = mw * mv;
+
+	// task min preparation
+	//for (i = 0; i < n; ++i) {
+	//  elem_t w_i = w[i] * mv, v_i = v[i] * mw;
+	//	weights_min[i] = min(w_i, v_i);
+	//}
+	//memcpy(task_get_costs(task_min), c, n*sizeof*c);
+	//*task_get_maxweight(task_min) = mw * mv;
 
 	task_solve_01(task_max_sol, task_max);
-	task_solve_01(task_min_sol, task_min);
+	//task_solve_01(task_min_sol, task_min);
 
 	// CHECK: if task_min_sol is acceptable solution for the task2, then it is the optimal solution for the task2
 
+	//P_wave = 0;
+	//{
+	//  elem_t tmpW, W = 0, maxW = *task_get_maxweight(task_max);
+	//	for (i = 0; i < n; ++i) {
+	//		P_wave += c[i];
+	//		tmpW = W + weights_max[i];
+	//		if (tmpW <= maxW) {
+	//			W = tmpW;
+	//		} else {
+	//			break;
+	//		}
+	//	}
+	//}
+
 	P_lower_bound = mul_vec(task_get_costs(task_max), task_max_sol, n);
-	P_upper_bound = mul_vec(task_get_costs(task_min), task_min_sol, n);
+	//P_upper_bound = mul_vec(task_get_costs(task_min), task_min_sol, n);
 	//memcpy(sol,task_max_sol, n*sizeof(elem_t));
 	//for (i = 0; i < n; ++i) {
 	//	sol[arrangement[i]] = task_max_sol[i];
 	//}
-	task_delete(task_min);
+	//task_delete(task_min);
 
-	P_wave = 2*P_lower_bound;//P_upper_bound;
+	P_wave = 2*P_lower_bound;
+	//P_wave = P_upper_bound;
+
+	if (!(P_wave/2 <= task2_ibarra1975_01__P_star && task2_ibarra1975_01__P_star <= P_wave)) {
+		__asm int 3;
+	}
 
 // Step 3
 	delta = P_wave * eps2 / REAL_T(9.0);
-	g = (unsigned)(REAL_T(9.0) / eps2);
+	g = (unsigned)(REAL_T(9.0) / eps2) + 1; // +1 is for case when delta should be = P_wave * eps2 / REAL_T(9.0) = 22 * 0.90001 / 9.0 = 0.220001, but became strict 0.22
 
 // Step 4
 	table = (struct TABLE *)alloca((g+1) * sizeof*table);
@@ -187,18 +212,41 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 			continue;
 		j = g - f_i;
 		for (;;) {
-			if (!is_empty_t(&table[j]) && table[j].W + w[i] <= mw && table[j].V + v[i] <= mv) {
-				if (is_empty_t(&table[j+f_i]) || table[j+f_i].W > table[j].W+w[i] /*||*/ && table[j+f_i].V > table[j].V+v[i]) {
-					if (!is_empty_t(&table[j+f_i])) {
-						if (table[j+f_i].W < table[j].W+w[i] || table[j+f_i].V < table[j].V+v[i]) {
-							__asm int 3;
+		  struct TABLE *cur = &table[j];
+			if (!is_empty_t(cur)) {
+				do {
+					if (cur->W + w[i] <= mw && cur->V + v[i] <= mv) {
+					  struct TABLE *upd = &table[j+f_i];
+						if (is_empty_t(upd)) {
+fill_upd:
+							upd->next = NULL;
+							set_list(&upd->L, cur->L, i);
+							upd->C = cur->C + c[i];
+							upd->W = cur->W + w[i];
+							upd->V = cur->V + v[i];
+						} else {
+							do {
+								if (upd->W > cur->W+w[i] || upd->V > cur->V+v[i]) {
+									while (upd->next != NULL) {
+										upd = upd->next;
+									}
+									upd->next = malloc(sizeof*upd);
+									upd = upd->next;
+									goto fill_upd;
+								}
+								upd = upd->next;
+							} while (upd != NULL);
 						}
+						//else if (table[j+f_i].W > cur->W+w[i] /*||*/ && table[j+f_i].V > cur->V+v[i]) {
+						//	if (!is_empty_t(&table[j+f_i])) {
+						//		if (table[j+f_i].W < table[j].W+w[i] || table[j+f_i].V < table[j].V+v[i]) {
+						//			__asm int 3;
+						//		}
+						//	}
+						// }
 					}
-					set_list(&table[j+f_i].L, table[j].L, i);
-					table[j+f_i].C = table[j].C + c[i];
-					table[j+f_i].W = table[j].W + w[i];
-					table[j+f_i].V = table[j].V + v[i];
-				}
+					cur = cur->next;
+				} while (cur != NULL);
 			}
 			if (j == 0) break;
 			--j;
@@ -215,30 +263,35 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	  elem_t alpha = 0;
 	  unsigned *tmp;
 #endif
-	  unsigned k,maxk = (unsigned)-1;
+	  unsigned k;
+	  struct TABLE *maxTABLE = NULL;
 	  elem_t max = 0;
 		for (k = 0; k <= g; ++k) {
-			if (!is_empty_t(&table[k])) {
+		  struct TABLE *cur = &table[k];
+			if (!is_empty_t(cur)) {
+				do {
 #if defined(USE_FILL) && (USE_FILL) != 0
-				//FILL(small, mw*mv - max(table[k].W*mv, table[k].V*mw), task_get_costs(task_max), task_get_weights(task_max), &alpha, I);
-				FILL(small, mw - table[k].W, mv - table[k].V, c, w, v, &alpha, I);
-				if (table[k].C + alpha > max) {
-					tmp = I; I = maxI; maxI = tmp;
-					max = table[k].C + alpha;
-					maxk = k;
-				}
+					//FILL(small, mw*mv - max(cur->W*mv, cur->V*mw), task_get_costs(task_max), task_get_weights(task_max), &alpha, I);
+					FILL(small, mw - cur->W, mv - cur->V, c, w, v, &alpha, I);
+					if (cur->C + alpha > max) {
+						tmp = I; I = maxI; maxI = tmp;
+						max = cur->C + alpha;
+						maxTABLE = cur;
+					}
 #else
-				if (table[k].C > max) {
-					max = table[k].C;
-					maxk = k;
-				}
+					if (cur->C > max) {
+						max = cur->C;
+						maxTABLE = cur;
+					}
 #endif
+					cur = cur->next;
+				} while (cur != NULL);
 			}
 		}
 		memset(sol, 0, n * sizeof*sol);
-		if (maxk != (unsigned)-1) {
+		if (maxTABLE != NULL) {
 		  struct L *l;
-			for (l = table[maxk].L; l != NULL; l = l->next) {
+			for (l = maxTABLE->L; l != NULL; l = l->next) {
 				sol[arrangement[l->i]] = 1;
 			}
 #if defined(USE_FILL) && (USE_FILL) != 0
