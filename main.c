@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 
-#define MODE 2
+#define MODE 4
 
 #if MODE==1
 
@@ -318,11 +318,49 @@ static void test01_4(void) {
 }
 
 
+// bad real eps
+static void test01_5(void) {
+  #define C {10, 1, 1, 8, 5, 7, 8}
+  #define W { 1, 8, 1, 7, 7, 2, 7}
+  #define V { 6, 1, 9, 3, 4, 4, 7,}
+  static TASK2_DECL(_task, 7, 9, 9, W, V, C);
+	elem_t sol[7], sol_ibarra[7];
+	static elem_t const rsol[] = { 1, 0, 0, 1, 1, 0, 0};
+	task2_solve_01(sol, (struct task2 *)&_task);
+	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
+	task2_print((struct task2 *)&_task);
+	task2_solution_print(sol, "sol       ", (struct task2 *)&_task);
+
+	{
+	  real_t eps, real_eps;
+	  elem_t P_star, P_roof;
+		P_star = mul_vec(sol, task2_get_costs((struct task2 *)&_task), 7);
+		printf("\n");
+
+		for (eps = REAL_T(1.5); eps > REAL_T(1.0); eps -= REAL_T(1.0) / (1<<5)) {
+			task2_ibarra1975_01(sol_ibarra, (struct task2 *)&_task, eps);
+
+			P_roof = mul_vec(sol_ibarra, task2_get_costs((struct task2 *)&_task), 7);
+			real_eps = (P_star - P_roof) / (real_t)P_roof;
+
+			printf("eps = %lf, real eps = %lf,", eps, real_eps);
+			task2_solution_print(sol_ibarra, "sol_ibarra", (struct task2 *)&_task);
+		}
+	}
+	//task2_ibarra1975_01(sol_ibarra, (struct task2 *)&_task, REAL_T(3.0));
+	//task2_solution_print(sol_ibarra, "sol_ibarra", (struct task2 *)&_task);
+  #undef C
+  #undef W
+  #undef V
+}
+
+
 int main() {
 	//test01_1();
 	//test01_2();
 	//test01_3();
-	test01_4();
+	//test01_4();
+	test01_5();
 }
 
 #endif
@@ -333,7 +371,7 @@ int main() {
 
 
 
-#if NODE==4
+#if MODE==4
 
 #define N 7
 

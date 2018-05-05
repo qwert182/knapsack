@@ -101,7 +101,7 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 
   struct task *task_max = task_create(n);
   elem_t *weights_max = task_get_weights(task_max);
-  elem_t *task_max_sol = alloca(n*sizeof(elem_t));
+  //elem_t *task_max_sol = alloca(n*sizeof(elem_t));
   elem_t P_lower_bound;
 
   //struct task *task_min = task_create(n);
@@ -145,7 +145,7 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	//memcpy(task_get_costs(task_min), c, n*sizeof*c);
 	//*task_get_maxweight(task_min) = mw * mv;
 
-	task_solve_01(task_max_sol, task_max);
+	//task_solve_01(task_max_sol, task_max);
 	//task_solve_01(task_min_sol, task_min);
 
 	// CHECK: if task_min_sol is acceptable solution for the task2, then it is the optimal solution for the task2
@@ -164,7 +164,7 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	//	}
 	//}
 
-	P_lower_bound = mul_vec(task_get_costs(task_max), task_max_sol, n);
+	//P_lower_bound = mul_vec(task_get_costs(task_max), task_max_sol, n);
 	//P_upper_bound = mul_vec(task_get_costs(task_min), task_min_sol, n);
 	//memcpy(sol,task_max_sol, n*sizeof(elem_t));
 	//for (i = 0; i < n; ++i) {
@@ -172,9 +172,10 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	//}
 	//task_delete(task_min);
 
-	P_wave = 2*P_lower_bound;
+	//P_wave = 2*P_lower_bound;
 	//P_wave = P_upper_bound;
 
+	P_wave = task2_ibarra1975_01__P_star;
 	if (!(P_wave/2 <= task2_ibarra1975_01__P_star && task2_ibarra1975_01__P_star <= P_wave)) {
 		__asm int 3;
 	}

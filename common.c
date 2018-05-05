@@ -83,7 +83,7 @@ void task2_print(struct task2 *task) {
 	printf(")\n");
 	printf(" weights    = (%2u", weights[0]);
 	for (i = 1; i < n; ++i) printf(",%2u", weights[i]);
-	printf(") <= %2u\n", *task2_get_maxweight(task));
+	printf(") <= %u\n", *task2_get_maxweight(task));
 	printf(" volumes    = (%2u", volumes[0]);
 	for (i = 1; i < n; ++i) printf(",%2u", volumes[i]);
 	printf(") <= %u\n", *task2_get_maxvolume(task));
