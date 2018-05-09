@@ -1,5 +1,9 @@
 #include <stddef.h>
 
+#ifndef max
+#define max(a,b) ((a)>=(b) ? (a) : (b))
+#endif
+
 #if defined (_MSC_VER) && (_MSC_VER <= 2020)
 #define inline __inline
 #endif

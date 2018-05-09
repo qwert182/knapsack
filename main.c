@@ -5,7 +5,7 @@
 #include <Windows.h>
 
 
-#define MODE 4
+#define MODE 1
 
 #if MODE==1
 
@@ -142,17 +142,33 @@ static void test01_8(void) {
   #undef P
 }
 
+static void test01_9(void) {
+  #define P {10,10,10,10, 3}
+  #define C { 1, 1, 1, 1, 6}
+  static TASK_DECL(_task, 5, 9, C, P);
+	elem_t sol[5], sol_ibarra[5];
+	static elem_t const rsol[] = {1, 1, 1, 1, 0};
+	task_solve_01(sol, (struct task *)&_task);
+	if (memcmp(sol, rsol, sizeof rsol)) fprintf(stderr, "err\n");
+	task_print((struct task *)&_task);
+	task_solution_print(sol, "sol", (struct task *)&_task);
+	task_ibarra1975_01(sol_ibarra, (struct task *)&_task, REAL_T(0.6512));
+	task_solution_print(sol_ibarra, "sol_ibarra", (struct task *)&_task);
+  #undef C
+  #undef P
+}
 
 
 int main() {
-	test01_1();
-	test01_2();
-	test01_3();
-	test01_4();
-	test01_5();
-	test01_6();
-	test01_7();
-	test01_8();
+	//test01_1();
+	//test01_2();
+	//test01_3();
+	//test01_4();
+	//test01_5();
+	//test01_6();
+	//test01_7();
+	//test01_8();
+	test01_9();
 }
 
 
@@ -395,8 +411,8 @@ int main(int argc, char **argv) {
 		task2_fill_random(task, 30);
 		task2_solve_01(sol, task);
 		P_star = mul_vec(sol, task2_get_costs(task), N);
-																															{extern elem_t task2_ibarra1975_01__P_star;
-																															task2_ibarra1975_01__P_star = P_star;}
+{extern elem_t task2_ibarra1975_01__P_star;
+task2_ibarra1975_01__P_star = P_star;}
 		//for (eps = REAL_T(0.1); eps <= REAL_T(1.0); eps += REAL_T(0.09)) {
 		for (eps_i = 0; eps_i < elements_in(eps_arr); ++eps_i) {
 			eps = eps_arr[eps_i];

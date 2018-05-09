@@ -119,7 +119,8 @@ void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps) {
 	}
 
 	//P_wave = P_wave - p[i] + p[i]*(M-C)/c[i];
-	P_wave += 50;
+	//P_wave += 50;
+	printf("P_wave = %u\n", P_wave);
 
 // Step 3
 	delta = P_wave * eps2 / REAL_T(9.0);

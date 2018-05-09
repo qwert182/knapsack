@@ -87,7 +87,7 @@ static void FILL(struct L *small, elem_t mw, elem_t mv, elem_t *c, elem_t *w, el
 	*C_out = C;
 }
 
-																																				extern elem_t task2_ibarra1975_01__P_star;elem_t task2_ibarra1975_01__P_star;
+extern elem_t task2_ibarra1975_01__P_star;elem_t task2_ibarra1975_01__P_star;
 
 void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 	//memset(sol, 0, task->n * sizeof(*sol));
@@ -177,7 +177,8 @@ void task2_ibarra1975_01(elem_t *sol, struct task2 *task, real_t eps) {
 
 	P_wave = task2_ibarra1975_01__P_star;
 	if (!(P_wave/2 <= task2_ibarra1975_01__P_star && task2_ibarra1975_01__P_star <= P_wave)) {
-		__asm int 3;
+		//__asm int 3;
+		fprintf(stderr, "error\n");
 	}
 
 // Step 3
