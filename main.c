@@ -1,4 +1,5 @@
 #include "common.h"
+#include "platform.h"
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@ int main(int argc, char **argv) {
   elem_t sol_ibarra[N];
   //int ch = -1;
   unsigned i = 0, tasks_n = 1000000;
-  unsigned start, end;
+  m_time start, end, diff;
   elem_t P_star, P_roof;
   real_t eps;
   static real_t const eps_arr[] = {REAL_T(1.0), REAL_T(0.9), REAL_T(0.8), REAL_T(0.7), REAL_T(0.6), REAL_T(0.5), REAL_T(0.4), REAL_T(0.3), REAL_T(0.2)};
@@ -19,7 +20,7 @@ int main(int argc, char **argv) {
 	(void)(argc, argv);
 	task = task_create(N);
 
-	start = GetTickCount();
+	m_time_get(&start);
 	for (; i < tasks_n;) {
 		++i;
 		task_fill_random(task, 20);
@@ -41,8 +42,9 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-	end = GetTickCount();
-	printf("time = %u.%03u sec, iters = %u, time/iter = %lf usec\n", (end - start)/1000, (end - start)%1000, i, (double)((end - start)*1000)/i);
+	m_time_get(&end);
+	m_time_diff(&diff, &start, &end);
+	printf("time = "M_TIME_SEC_MSEC_FMT" sec, iters = %u, time/iter = %lf usec\n", M_TIME_SEC_MSEC_ARGS(diff), i, (double)M_TIME_IN_USEC(diff)/i);
 
 	task_delete(task);
 	return 0;

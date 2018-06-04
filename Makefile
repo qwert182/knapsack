@@ -17,7 +17,7 @@ ibarra1975-2.o: ibarra1975-2.c common.h
 ibarra1975.o: ibarra1975.c common.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o ibarra1975.o ibarra1975.c
 
-main.o: main.c common.h
+main.o: main.c common.h platform.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o main.o main.c
 
 .PHONY: clean
