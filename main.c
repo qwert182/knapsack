@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <memory.h>
 #include <stdlib.h>
-#include <Windows.h>
 
 
 #define MODE 1
