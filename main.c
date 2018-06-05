@@ -29,12 +29,22 @@ struct solver_params {
 	int (*check_solution)(elem_t sol_val_approx, elem_t sol_val_exact, struct solver_parameter *solver_param);
 };
 
+struct task_params {
+	struct task * (*create)(unsigned n);
+	void (*fill_random)(struct task *task, elem_t max);
+	elem_t * (*get_costs)(struct task *task);
+	void (*print)(struct task *task);
+	void (*solution_print)(elem_t *sol, const char *name, struct task *task);
+	void (*delete)(struct task *task);
+};
+
 struct runner_params {
 	unsigned N;
 	struct when_to_stop stop_on;
 	struct random_parameters random;
 	struct exact_solver_params exact_solver;
 	struct solver_params solver;
+	struct task_params task;
 };
 
 struct ibarra1975_parameters {
@@ -86,24 +96,24 @@ static int run_random_tasks(struct runner_params *params) {
   elem_t sol_val_exact, sol_val_approx;
   struct solver_parameters_context *solver_params_context;
   struct solver_parameter *solver_param;
-	task = task_create(params->N);
+	task = params->task.create(params->N);
 
 	tasks_ran = 0;
 	m_time_get(&time_start);
 	while (tasks_ran < params->stop_on.tasks_n) {
-		task_fill_random(task, params->random.max_value);
+		params->task.fill_random(task, params->random.max_value);
 		params->exact_solver.run(sol_exact, task);
-		sol_val_exact = mul_vec(sol_exact, task_get_costs(task), params->N);
+		sol_val_exact = mul_vec(sol_exact, params->task.get_costs(task), params->N);
 
 		params->solver.init_params_context(&solver_params_context);
 		while ((solver_param = solver_params_context->next(solver_params_context)) != NULL) {
 			params->solver.run(sol_approx, task, solver_param);
-			sol_val_approx = mul_vec(sol_approx, task_get_costs(task), params->N);
+			sol_val_approx = mul_vec(sol_approx, params->task.get_costs(task), params->N);
 			if (!params->solver.check_solution(sol_val_approx, sol_val_exact, solver_param)) {
 				//printf("error eps = %lf\n", eps);
-				task_print(task);
-				task_solution_print(sol_exact, "sol_exact", task);
-				task_solution_print(sol_approx, "sol_approx", task);
+				params->task.print(task);
+				params->task.solution_print(sol_exact, "sol_exact", task);
+				params->task.solution_print(sol_approx, "sol_approx", task);
 				printf("\n");
 			}
 		}
@@ -115,14 +125,14 @@ static int run_random_tasks(struct runner_params *params) {
 	m_time_diff(&time_diff, &time_start, &time_end);
 	printf("time = "M_TIME_SEC_MSEC_FMT" sec, iters = %u, time/iter = %lf usec\n", M_TIME_SEC_MSEC_ARGS(time_diff), tasks_ran, M_TIME_IN_USEC_DBL(time_diff)/tasks_ran);
 
-	task_delete(task);
+	params->task.delete(task);
 	free(sol_approx);
 	free(sol_exact);
 	return 0;
 }
 
 int main(int argc, char **argv) {
-  struct runner_params params = {5, {1000000,0}, {20}, {task_solve_01}, {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution}};
+  struct runner_params params = {5, {1000000,0}, {20}, {task_solve_01}, {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution}, {task_create, task_fill_random, task_get_costs, task_print, task_solution_print, task_delete}};
 	// general logic
 	// read options
 
