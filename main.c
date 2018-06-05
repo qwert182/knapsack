@@ -1,97 +1,155 @@
 #include "common.h"
 #include "platform.h"
 #include <stdio.h>
-#include <memory.h>
-#include <stdlib.h>
+//#include <memory.h>
+//#include <stdlib.h>
+#include <string.h>
+#include <malloc.h>
 
-#define N 7
+struct when_to_stop {
+	unsigned tasks_n;
+	unsigned time_in_sec;
+};
 
-int main(int argc, char **argv) {
+struct random_parameters {
+	elem_t max_value;
+};
+
+struct exact_solver_params {
+	void (*run)(elem_t *sol, struct task *task);
+};
+
+struct solver_parameters_context {
+	struct solver_parameter * (*next)(struct solver_parameters_context *);
+};
+
+struct solver_params {
+	void (*init_params_context)(struct solver_parameters_context **);
+	void (*run)(elem_t *sol, struct task *task, struct solver_parameter *);
+	int (*check_solution)(elem_t sol_val_approx, elem_t sol_val_exact, struct solver_parameter *solver_param);
+};
+
+struct runner_params {
+	unsigned N;
+	struct when_to_stop stop_on;
+	struct random_parameters random;
+	struct exact_solver_params exact_solver;
+	struct solver_params solver;
+};
+
+struct ibarra1975_parameters {
+	real_t eps;
+};
+
+struct ibarra1975_parameters_context {
+	struct solver_parameters_context parent;
+	struct ibarra1975_parameters params;
+	int eps_i;
+};
+
+struct solver_parameter *stupid_epsilon_iterator_next(struct solver_parameters_context *in_ctx) {
+  struct ibarra1975_parameters_context *ctx = (void*)in_ctx;
+	if (ctx->eps_i > 0) {
+		ctx->params.eps = (real_t)ctx->eps_i / REAL_T(10.0);
+		--ctx->eps_i;
+		return (struct solver_parameter *)&ctx->params;
+	} else {
+		return NULL;
+	}
+}
+
+static void stupid_epsilon_iterator_init_context(struct solver_parameters_context **out_ctx) {
+  struct ibarra1975_parameters_context *ctx;
+	ctx = malloc(sizeof(*ctx));
+	ctx->parent.next = stupid_epsilon_iterator_next;
+	ctx->eps_i = 10;
+	*out_ctx = &ctx->parent;
+}
+
+static void ibarra1975_run(elem_t *sol, struct task *task, struct solver_parameter *in_param) {
+  struct ibarra1975_parameters *param = (void*)in_param;
+	task_ibarra1975_01(sol, task, param->eps);
+}
+
+static int ibarra1975_check_solution(elem_t sol_val_approx, elem_t sol_val_exact, struct solver_parameter *in_param) {
+  struct ibarra1975_parameters *param = (void*)in_param;
+	return sol_val_approx >= sol_val_exact * (REAL_T(1.0) - param->eps);
+}
+
+static int run_random_tasks(struct runner_params *params) {
   struct task *task;
-  elem_t sol[N];
-  elem_t sol_ibarra[N];
+  elem_t *sol_exact = malloc(params->N * sizeof*sol_exact);
+  elem_t *sol_approx = malloc(params->N * sizeof*sol_approx);
   //int ch = -1;
-  unsigned i = 0, tasks_n = 1000000;
-  m_time start, end, diff;
-  elem_t P_star, P_roof;
-  real_t eps;
-  static real_t const eps_arr[] = {REAL_T(1.0), REAL_T(0.9), REAL_T(0.8), REAL_T(0.7), REAL_T(0.6), REAL_T(0.5), REAL_T(0.4), REAL_T(0.3), REAL_T(0.2)};
-  unsigned eps_i;
-	(void)(argc, argv);
-	task = task_create(N);
+  unsigned tasks_ran;
+  m_time time_start, time_end, time_diff;
+  elem_t sol_val_exact, sol_val_approx;
+  struct solver_parameters_context *solver_params_context;
+  struct solver_parameter *solver_param;
+	task = task_create(params->N);
 
-	m_time_get(&start);
-	for (; i < tasks_n;) {
-		++i;
-		task_fill_random(task, 20);
-		task_solve_01(sol, task);
-		P_star = mul_vec(sol, task_get_costs(task), N);
-		//for (eps = REAL_T(0.1); eps <= REAL_T(1.0); eps += REAL_T(0.09)) {
-		for (eps_i = 0; eps_i < elements_in(eps_arr); ++eps_i) {
-			eps = eps_arr[eps_i];
-			task_ibarra1975_01(sol_ibarra, task, eps);
-			P_roof = mul_vec(sol_ibarra, task_get_costs(task), task->n);
-			if (!(P_roof >= P_star * (REAL_T(1.0) - eps)) && P_roof != 0) {
-			//if (!((P_star - P_roof)/(real_t)P_star <= eps/3.0f)) {
-				printf("error eps = %lf\n", eps);
+	tasks_ran = 0;
+	m_time_get(&time_start);
+	while (tasks_ran < params->stop_on.tasks_n) {
+		task_fill_random(task, params->random.max_value);
+		params->exact_solver.run(sol_exact, task);
+		sol_val_exact = mul_vec(sol_exact, task_get_costs(task), params->N);
+
+		params->solver.init_params_context(&solver_params_context);
+		while ((solver_param = solver_params_context->next(solver_params_context)) != NULL) {
+			params->solver.run(sol_approx, task, solver_param);
+			sol_val_approx = mul_vec(sol_approx, task_get_costs(task), params->N);
+			if (!params->solver.check_solution(sol_val_approx, sol_val_exact, solver_param)) {
+				//printf("error eps = %lf\n", eps);
 				task_print(task);
-				task_solution_print(sol, "sol", task);
-				task_solution_print(sol_ibarra, "sol_ibarra", task);
-				task_ibarra1975_01(sol_ibarra, task, eps);
+				task_solution_print(sol_exact, "sol_exact", task);
+				task_solution_print(sol_approx, "sol_approx", task);
 				printf("\n");
 			}
 		}
+		free(solver_params_context);
+
+		++tasks_ran;
 	}
-	m_time_get(&end);
-	m_time_diff(&diff, &start, &end);
-	printf("time = "M_TIME_SEC_MSEC_FMT" sec, iters = %u, time/iter = %lf usec\n", M_TIME_SEC_MSEC_ARGS(diff), i, (double)M_TIME_IN_USEC(diff)/i);
+	m_time_get(&time_end);
+	m_time_diff(&time_diff, &time_start, &time_end);
+	printf("time = "M_TIME_SEC_MSEC_FMT" sec, iters = %u, time/iter = %lf usec\n", M_TIME_SEC_MSEC_ARGS(time_diff), tasks_ran, M_TIME_IN_USEC_DBL(time_diff)/tasks_ran);
 
 	task_delete(task);
+	free(sol_approx);
+	free(sol_exact);
 	return 0;
 }
-/*
+
 int main(int argc, char **argv) {
-  struct task2 *task;
-  elem_t sol[N];
-  elem_t sol_ibarra[N];
-  //int ch = -1;
-  unsigned i = 0, tasks_n = 100000;
-  unsigned start, end;
-  elem_t P_star, P_roof;
-  real_t eps;
-  static real_t const eps_arr[] = {REAL_T(1.0), REAL_T(0.9), REAL_T(0.8), REAL_T(0.7), REAL_T(0.6), REAL_T(0.5), REAL_T(0.4), REAL_T(0.3), REAL_T(0.2)};
-  unsigned eps_i;
-	(void)(argc, argv);
-	task = task2_create(N);
+  struct runner_params params = {5, {1000000,0}, {20}, {task_solve_01}, {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution}};
+	// general logic
+	// read options
 
-	start = GetTickCount();
-	for (; i < tasks_n;) {
-		++i;
-		task2_fill_random(task, 30);
-		task2_solve_01(sol, task);
-		P_star = mul_vec(sol, task2_get_costs(task), N);
-{extern elem_t task2_ibarra1975_01__P_star;
-task2_ibarra1975_01__P_star = P_star;}
-		//for (eps = REAL_T(0.1); eps <= REAL_T(1.0); eps += REAL_T(0.09)) {
-		for (eps_i = 0; eps_i < elements_in(eps_arr); ++eps_i) {
-			eps = eps_arr[eps_i];
-			task2_ibarra1975_01(sol_ibarra, task, eps);
-			P_roof = mul_vec(sol_ibarra, task2_get_costs(task), task->n);
-			if (!(P_roof >= P_star * (REAL_T(1.0) - eps)) ) {
-			//if (!((P_star - P_roof)/(real_t)P_star <= eps/3.0f)) {
-				printf("error eps = %lf\n", eps);
-				task2_print(task);
-				task2_solution_print(sol, "sol       ", task);
-				task2_solution_print(sol_ibarra, "sol_ibarra", task);
-				//task2_ibarra1975_01(sol_ibarra, task, eps);
-				printf("\n");
-			}
-		}
+	return run_random_tasks(&params);
+
+	// select operating mode
+	//   static tests | tests on random tasks: {for check, for performance} | solve problem from stdin/file (need?)
+	// select problem dimensions
+	//   1 constraint | 2 constraints
+	// select problem type
+	//   {0/1} (for ibarra75) | unbounded (for kohli92) | linear (need?)
+	// select solver
+	//   greedy | kohli92 | ibarra75 (eps) | exact | glpk (probably has eps) | lp_solve ?
+	//   and its options (like eps, ...)
+	// what about testing many eps ?
+	// do it in general mean (call abstract methods)
+
+	//printf("mode=%s, constraints=%s, type=%s, solver=%s\n", mode, constraints, type, solver);
+/*
+	if (raw_opts.mode == NULL) {
+		fprintf(stderr, "ERROR: "OPTION_MODE" is not set\n");
+		return 1;
+	} else if (strcmp(raw_opts.mode, MODE_STATIC_TESTS) == 0) {
+	} else if (strcmp(raw_opts.mode, MODE_RANDOM_TASKS) == 0) {
+	} else {
+		fprintf(stderr, "ERROR: unknown "OPTION_MODE"='%s'\n", raw_opts.mode);
+		return 1;
 	}
-	end = GetTickCount();
-	printf("time = %u.%03u sec, iters = %u, time/iter = %lf usec\n", (end - start)/1000, (end - start)%1000, i, (double)((end - start)*1000)/i);
-
-	task2_delete(task);
-	return 0;
-}
 */
+}
