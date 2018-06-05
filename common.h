@@ -55,6 +55,7 @@ void task_solution_print(elem_t *sol, const char *name, struct task *task);
 
 void task_solve_01(elem_t *sol, struct task *task);
 void task_ibarra1975_01(elem_t *sol, struct task *task, real_t eps);
+void glpk_solve_01(elem_t *sol, struct task *task);
 
 
 

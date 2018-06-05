@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
     .N = 5,
     .stop_on = {.tasks_n = 1000000, .time_in_sec = 0},
     .random = {.max_value = 20},
-    {task_solve_01},
+    .exact_solver = {glpk_solve_01}, //{task_solve_01},
     {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution},
     {task_create, task_fill_random, task_get_costs, task_print, task_solution_print, task_delete}
   };
