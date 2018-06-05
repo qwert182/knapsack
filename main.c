@@ -6,6 +6,64 @@
 #include <string.h>
 #include <malloc.h>
 
+// mode = static-tests {
+//   .solver : solver
+// }
+// mode = random-tasks {
+//   .N : int
+//   .solver : solver {
+//     .parameters : parameters
+//   }
+//   .parameter-space : parameter-space {
+//   }
+// }
+
+#define OPTION_MODE "mode"
+#define OPTION_CONSTRAINTS "constraints"
+#define OPTION_TYPE "type"
+#define OPTION_SOLVER "solver"
+#define OPTION_HELP "help"
+struct raw_options {
+  const char *mode, *constraints, *type, *solver;
+};
+
+#define CHECK_ARG_FOR_OPTION(arg, name, value) \
+	if (strncmp(arg, "--"name"=", sizeof("--"name"=")-1) == 0) { \
+		value = arg + sizeof("--"name"=") - 1; \
+	}
+
+#define MODE_STATIC_TESTS "static-tests"
+#define MODE_RANDOM_TASKS "random-tasks"
+
+static void show_usage(FILE *f) {
+	fprintf(f,
+	           "knapsack-test [options]\n"
+	           "  --"OPTION_MODE"="MODE_STATIC_TESTS"|"MODE_RANDOM_TASKS"\n"
+	           "  --"OPTION_CONSTRAINTS"=1|2\n"
+	           "  --"OPTION_TYPE"=bin|int\n"
+	           "  --"OPTION_SOLVER"=exact|ibarra75\n"
+	);
+}
+
+static int read_options(int argc, char **argv, struct raw_options *opts) {
+  int i;
+	for (i = 1; i < argc; ++i) {
+		CHECK_ARG_FOR_OPTION(argv[i], OPTION_MODE, opts->mode)
+		else CHECK_ARG_FOR_OPTION(argv[i], OPTION_CONSTRAINTS, opts->constraints)
+		else CHECK_ARG_FOR_OPTION(argv[i], OPTION_TYPE, opts->type)
+		else CHECK_ARG_FOR_OPTION(argv[i], OPTION_SOLVER, opts->solver)
+		else if (strcmp(argv[i], "--"OPTION_HELP) == 0) {
+			show_usage(stderr);
+			return 1;
+		} else {
+			fprintf(stderr, "ERROR: unknown option '%s'\n", argv[i]);
+			show_usage(stderr);
+			return 1;
+		}
+	}
+	return 0;
+}
+
 struct when_to_stop {
 	unsigned tasks_n;
 	unsigned time_in_sec;
@@ -122,9 +180,11 @@ static int run_random_tasks(struct runner_params *params) {
 }
 
 int main(int argc, char **argv) {
+  struct raw_options raw_opts = {0};
   struct runner_params params = {5, {1000000,0}, {20}, {task_solve_01}, {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution}};
 	// general logic
 	// read options
+	if (read_options(argc, argv, &raw_opts) != 0) return 1;
 
 	return run_random_tasks(&params);
 
