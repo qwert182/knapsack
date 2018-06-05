@@ -132,7 +132,14 @@ static int run_random_tasks(struct runner_params *params) {
 }
 
 int main(int argc, char **argv) {
-  struct runner_params params = {5, {1000000,0}, {20}, {task_solve_01}, {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution}, {task_create, task_fill_random, task_get_costs, task_print, task_solution_print, task_delete}};
+  struct runner_params params = {
+    .N = 5,
+    .stop_on = {.tasks_n = 1000000, .time_in_sec = 0},
+    .random = {.max_value = 20},
+    {task_solve_01},
+    {stupid_epsilon_iterator_init_context, ibarra1975_run, ibarra1975_check_solution},
+    {task_create, task_fill_random, task_get_costs, task_print, task_solution_print, task_delete}
+  };
 	// general logic
 	// read options
 
