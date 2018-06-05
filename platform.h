@@ -13,8 +13,7 @@
 typedef struct timespec m_time;
 
 static inline void m_time_get(m_time *t) {
-	//clock_gettime(CLOCK_REALTIME, t);
-	clock_gettime(CLOCK_THREAD_CPUTIME_ID, t);
+	clock_gettime(CLOCK_MONOTONIC, t);
 }
 
 static inline void m_time_diff(m_time *r, m_time *t1, m_time *t2) {
@@ -27,9 +26,9 @@ static inline void m_time_diff(m_time *r, m_time *t1, m_time *t2) {
 	}
 }
 
-#define M_TIME_SEC_MSEC_FMT "%u.%03u"
+#define M_TIME_SEC_MSEC_FMT "%lu.%03lu"
 #define M_TIME_SEC_MSEC_ARGS(t) ((t).tv_sec), ((t).tv_nsec/1000000)
-#define M_TIME_IN_USEC(t) ((t).tv_sec*1000000 + (t).tv_nsec/1000)
+#define M_TIME_IN_USEC_DBL(t) ((t).tv_sec*1000000.0 + (t).tv_nsec/1000.0)
 
 #elif M_TIME_FUNCTION == M_TIME_GETTICKCOUNT
 
@@ -47,7 +46,7 @@ static inline void m_time_diff(m_time *r, m_time *t1, m_time *t2) {
 
 #define M_TIME_SEC_MSEC_FMT "%u.%03u"
 #define M_TIME_SEC_MSEC_ARGS(t) (t)/1000, (t)%1000
-#define M_TIME_IN_USEC(t) ((t)*1000)
+#define M_TIME_IN_USEC_DBL(t) ((t)*1000.0)
 
 #else
 
