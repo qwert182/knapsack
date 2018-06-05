@@ -1,6 +1,6 @@
-knapsack-test: main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o
+knapsack-test: main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o glpk.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o knapsack-test \
-	main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o
+	main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o glpk.o
 
 common.o: common.c common.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o common.o common.c
@@ -20,7 +20,10 @@ ibarra1975.o: ibarra1975.c common.h
 main.o: main.c common.h platform.h
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o main.o main.c
 
+glpk.o: glpk.c common.h
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o glpk.o glpk.c
+
 .PHONY: clean
 
 clean:
-	rm knapsack-test main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o
+	rm knapsack-test main.o common.o exact.o exact-2.o ibarra1975.o ibarra1975-2.o glpk.o
