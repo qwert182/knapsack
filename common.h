@@ -8,7 +8,7 @@
 #define inline __inline
 #endif
 
-#define offset_of(s,f) ((unsigned)&((s*)0)->f)
+#define offset_of(s,f) ((size_t)&((s*)0)->f)
 #define elements_in(arr) (sizeof(arr)/sizeof*(arr))
 
 typedef int elem_t;
